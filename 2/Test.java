@@ -18,5 +18,8 @@ public class Test{
         System.out.println(bl0);
         boolean bl1 = false;
         System.out.println(bl1);
+
+        String str = "hello world";
+        System.out.println(str);
     }
 }
