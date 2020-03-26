@@ -51,20 +51,29 @@ import org.apache.parquet.hadoop.ParquetWriter;
 public class StreamingJob {
 
 	public static void main(String[] args) throws Exception {
-		Schema schema = new Schema.Parser().parse(new File("/Volumes/data/liwang/project/java_learn/10/parquet_test/test_schema.avsc"));
-		System.out.println(schema.toString());
-		Path path = new Path("/Volumes/data/liwang/project/java_learn/10/parquet_test/test_record.parquet");
-		GenericRecord record = new GenericData.Record(schema);
-		record.put("left", "abc");
-		record.put("right", "def");
-		ParquetWriter<GenericRecord> writer = AvroParquetWriter.<GenericRecord>builder(path)
-			.withSchema(schema)
-			.build();
-		try {
-			writer.write(record);
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (args.length == 0) {
+			System.out.println("please input action.");
+			return ;
 		}
-		writer.close();
+		String action = args[0];
+		if (action.equals("write")) {
+			Schema schema = new Schema.Parser().parse(new File("/Volumes/data/liwang/project/java_learn/10/parquet_test/test_schema.avsc"));
+			System.out.println(schema.toString());
+			Path path = new Path("/Volumes/data/liwang/project/java_learn/10/parquet_test/test_record.parquet");
+			GenericRecord record = new GenericData.Record(schema);
+			record.put("left", "abc");
+			record.put("right", "def");
+			ParquetWriter<GenericRecord> writer = AvroParquetWriter.<GenericRecord>builder(path)
+				.withSchema(schema)
+				.build();
+			try {
+				writer.write(record);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			writer.close();
+		} else if (action.equals("read")) {
+
+		}
 	}
 }
