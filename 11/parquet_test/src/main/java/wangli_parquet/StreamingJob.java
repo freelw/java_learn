@@ -53,58 +53,7 @@ import org.apache.parquet.hadoop.ParquetReader;
 public class StreamingJob {
 
 	public static void main(String[] args) throws Exception {
-		if (args.length == 0) {
-			System.out.println("please input action.");
-			return ;
-		}
-		String action = args[0];
-		String basePath = StreamingJob.class.getProtectionDomain().getCodeSource().getLocation().getPath() + "/../";
-		String avscPath = basePath + "./test_schema.avsc";
-		String parquetPath = basePath + "./test_record.parquet";
-		Path path = new Path(parquetPath);
-		Schema schema = new Schema.Parser().parse(new File(avscPath));
-		if (action.equals("write")) {
-			System.out.println(schema.toString());
-			GenericRecord record = new GenericData.Record(schema);
-			record.put("domain", "baidu.com");
-			record.put("url", "http://www.baidu.com/");
-			ParquetWriter<GenericRecord> writer = AvroParquetWriter.<GenericRecord>builder(path)
-				.withSchema(schema)
-				.build();
-			try {
-				writer.write(record);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			writer.close();
-		} else if (action.equals("read")) {
-			ParquetReader<GenericRecord> reader = AvroParquetReader.<GenericRecord>builder(path)
-				.build();
-			GenericRecord record;
-			while ((record = reader.read())!= null){
-				System.out.println(record);
-			}
-		} else if (action.equals("sink")) {
-			String outputBasePath = basePath + "/sinkoutput/";
-			SinkTask.work(schema, outputBasePath);
-			/*Schema schema = new Schema.Parser().parse(new File(avscPath));
-			final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-			DataStream<String> text = env.socketTextStream("192.168.3.7", 9000, "\n");
-			DataStream<GenericRecord> webSiteDataStream = text.map((str) -> {
-				WebSite webSite = new WebSite();
-				String[] parts = str.split("\\s");
-				GenericRecord record = new GenericData.Record(schema);
-				record.put("domain", parts[0]);
-				record.put("url", parts[1]);
-				return record;
-			});
-			//webSiteDataStream.addSink(new SinkToMySQL());
-			String outputBasePath = basePath + "/sinkoutput/";
-			final StreamingFileSink<GenericRecord> sink = StreamingFileSink
-				.forBulkFormat(new Path(outputBasePath), ParquetAvroWriters.forGenericRecord(schema))
-				.build();
-			webSiteDataStream.addSink(sink);
-			env.execute("website task.");*/
-		}
+		String outputBasePath = "hdfs://192.168.3.30:9000/sinkoutput/";
+		SinkTask.work(outputBasePath);
 	}
 }
