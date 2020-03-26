@@ -33,8 +33,10 @@ import java.io.IOException;
 import java.io.File;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.avro.AvroParquetWriter;
+import org.apache.parquet.avro.AvroParquetReader;
 import org.apache.parquet.io.OutputFile;
 import org.apache.parquet.hadoop.ParquetWriter;
+import org.apache.parquet.hadoop.ParquetReader;
 
 /**
  * Skeleton for a Flink Streaming Job.
@@ -56,10 +58,10 @@ public class StreamingJob {
 			return ;
 		}
 		String action = args[0];
+		Path path = new Path("/Volumes/data/liwang/project/java_learn/10/parquet_test/test_record.parquet");
 		if (action.equals("write")) {
 			Schema schema = new Schema.Parser().parse(new File("/Volumes/data/liwang/project/java_learn/10/parquet_test/test_schema.avsc"));
 			System.out.println(schema.toString());
-			Path path = new Path("/Volumes/data/liwang/project/java_learn/10/parquet_test/test_record.parquet");
 			GenericRecord record = new GenericData.Record(schema);
 			record.put("left", "abc");
 			record.put("right", "def");
@@ -73,7 +75,12 @@ public class StreamingJob {
 			}
 			writer.close();
 		} else if (action.equals("read")) {
-
+			ParquetReader<GenericRecord> reader = AvroParquetReader.<GenericRecord>builder(path)
+				.build();
+			GenericRecord record;
+			while ((record = reader.read())!= null){
+				System.out.println(record);
+			}
 		}
 	}
 }
